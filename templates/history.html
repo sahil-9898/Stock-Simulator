@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Shares</th>
+        <th>Price</th>
+        <th>Transacted</th>
+    </tr>
+    </thead>
+    {% for row in data %}
+    <tr>
+    {% for item in row %}
+    {% if item is not string and item>20%}
+        <td>₹{{ item }}</td>
+    {% else %}
+        <td>{{ item }}</td>
+    {% endif %}
+    {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
