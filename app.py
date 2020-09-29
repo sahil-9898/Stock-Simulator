@@ -273,3 +273,7 @@ def changepass():
     else:    
         return render_template("changepass.html")
 
+@app.route("/portfolio")
+@login_required
+def portfolio():
+    return render_template("portfolio.html")
