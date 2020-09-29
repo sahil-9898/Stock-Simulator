@@ -30,6 +30,7 @@ Session(app)
 
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
+success="Success"
 
 
 @app.route("/")
@@ -139,6 +140,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # redirect user to home page
+        flash(success)
         return redirect(url_for("index"))
 
     # else if user reached route via GET (as by clicking a link or via redirect)
@@ -202,10 +204,8 @@ def register():
         result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
         if not result:
             return apology("username already exists")
-        
-        session["user_id"] = result
-        
-        return redirect(url_for("index"))
+        flash(success)
+        return redirect(url_for("login"))
 
     else:    
         return render_template("register.html")
@@ -273,3 +273,7 @@ def changepass():
     else:    
         return render_template("changepass.html")
 
+@app.route("/portfolio")
+@login_required
+def portfolio():
+    return render_template("portfolio.html")

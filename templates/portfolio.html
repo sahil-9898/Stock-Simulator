@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+<style type="text/css">
+
+    h2 {
+        color: black;
+        font-size: larger;
+    }
+
+    h5{
+        color: #22000c;
+        font-family: "Agency FB";
+        font-size: larger;
+        text-align: center;
+    }
+    /* Float four columns side by side */
+    .column {
+        float: left;
+        width: 25%;
+        padding: 0 20px;
+
+    }
+
+    /* Remove extra left and right margins, due to padding in columns */
+    .row {margin: 0 -5px;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    /*Style the counter cards*/
+    .card {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); 
+        padding: 16px;
+        text-align: center;
+        background-color: #f1f1f1;
+    }
+    
+</style>
+
+
+
+<div class="jumbotron card card-image" style="background-image: url(https://mdbootstrap.com/img/Photos/Others/gradient1.jpg)">
+    <div class="card-deck">
+        <div class="card" style="width: 17rem">
+            <div class="card-header">
+                <h2>LATEST VALUE</h2>
+            </div>
+            <div class="card-body"  >
+                <p class="card-text">10,52,289</p>
+            </div>
+        </div>
+        <div class="card" style="width: 17rem">
+            <div class="card-header">
+                <h2>TODAY'S  GAIN/LOSS</h2>
+            </div>
+            <div class="card-body" >
+                <p class="card-text">-234,523  <span style="font-size:15px;color:crimson">&darr;(-2.18%)</span></p>
+            </div>
+        </div>
+        <div class="card" style="width: 17rem">
+            <div class="card-header">
+                <h2>OVERALL  GAIN/LOSS</h2>
+            </div>
+            <div class="card-body" >
+                <p class="card-text">1325.035  <span style="font-size:15px;color: green">&uarr;(+14.28%)</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th><h2>Stock<br>quantity<br>current price</h2></th>
+            <th><h2>invested amount<br>average price</h2></th>
+            <th><h2>latest value<br>day's G/L</h2></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td><h5><span style="font-size:25px;color: blueviolet">adani</span><br>(4000)<br>2656<span style="color: red">(-60.06)</span> </h5></td>
+            <td><h5>adani<br>(4000) </h5></td>
+            <td><h5>adani<br>(4000) </h5></td>
+        </tr>
+
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
