@@ -56,15 +56,15 @@
                 <h2>LATEST VALUE</h2>
             </div>
             <div class="card-body"  >
-                <p class="card-text">10,52,289</p>
+                <p class="card-text">₹{{ "%.2f"|format(lat_value)}}</p>
             </div>
         </div>
         <div class="card" style="width: 17rem">
             <div class="card-header">
-                <h2>TODAY'S  GAIN/LOSS</h2>
+                <h2>TOP GAINERS/LOSSERS</h2>
             </div>
             <div class="card-body" >
-                <p class="card-text">-234,523  <span style="font-size:15px;color:crimson">&darr;(-2.18%)</span></p>
+                <p class="card-text"><span style="font-size:15px;color:green">{{top_gain}}</span><br><span style="font-size:15px;color:crimson">{{top_loss}}</span></p>
             </div>
         </div>
         <div class="card" style="width: 17rem">
@@ -72,7 +72,7 @@
                 <h2>OVERALL  GAIN/LOSS</h2>
             </div>
             <div class="card-body" >
-                <p class="card-text">1325.035  <span style="font-size:15px;color: green">&uarr;(+14.28%)</span></p>
+                <p class="card-text">₹{{"%.2f"|format(overall_gl)}}</p>
             </div>
         </div>
     </div>
@@ -83,19 +83,19 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th><h2>Stock<br>quantity<br>current price</h2></th>
-            <th><h2>invested amount<br>average price</h2></th>
-            <th><h2>latest value<br>day's G/L</h2></th>
+            <th><h2>Stock<br>Quantity<br>Buy Price</h2></th>
+            <th><h2>Invested Amount</h2></th>
+            <th><h2>Latest Value<br>Day's G/L</h2></th>
         </tr>
         </thead>
         <tbody>
-
+        {% for row in data %}
         <tr>
-            <td><h5><span style="font-size:25px;color: blueviolet">adani</span><br>(4000)<br>2656<span style="color: red">(-60.06)</span> </h5></td>
-            <td><h5>adani<br>(4000) </h5></td>
-            <td><h5>adani<br>(4000) </h5></td>
+            <td><h5><span style="font-size:25px;color: blueviolet">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h5></td>
+            <td><h5><br>₹{{row[1]*row[2]}}</h5></td>
+            <td><h5>₹{{row[3]}}<br>₹{{ "%.2f"|format((row[3]-row[2])*row[1])}}</h5></td>
         </tr>
-
+        {% endfor %}
         </tbody>
     </table>
 

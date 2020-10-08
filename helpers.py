@@ -51,10 +51,9 @@ def lookup(symbol):
         return None
 
     # ensure stock exists
-    try:
-        price = stockdetails['buyPrice1']
-    except:
-        return None
+    price = stockdetails['buyPrice1']
+    if price==None:
+        price = stockdetails['lastPrice']
 
     # return stock's name (as a str), price (as a float), and (uppercased) symbol (as a str)
     return {

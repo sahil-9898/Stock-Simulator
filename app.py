@@ -276,4 +276,36 @@ def changepass():
 @app.route("/portfolio")
 @login_required
 def portfolio():
-    return render_template("portfolio.html")
+    symbol=list()
+    share=list()
+    price=list()
+    latest=list()
+    # total=[]
+    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
+    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
+    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
+    if len(sy)!=0:
+        for i in range (len(sy)):
+            symbol.append(sy[i]["symbol"].upper())
+            prc=lookup(sy[i]["symbol"])
+            latest.append(prc["price"])
+        for i in range (len(sh)):
+            share.append(sh[i]["shares"])  
+        for i in range (len(pr)):
+            price.append(pr[i]["price"])
+        # templates=dict(symbols=symbol,shares=share,prices=price)
+        data = zip(symbol,share,price,latest)
+        inv_amt=list()
+        gl=list()
+        for i in range (len(sy)):
+            gl.append((latest[i]-price[i])*share[i])
+            inv_amt.append(price[i]*share[i])
+        lat_value=sum(inv_amt)+sum(gl)
+        top_gain_index=gl.index(max(gl))
+        top_loss_index=gl.index(min(gl))
+        top_gain_symbol=symbol[top_gain_index]
+        top_loss_symbol=symbol[top_loss_index]
+        overall_gl=sum(gl)
+        return render_template("portfolio.html",data=data,lat_value=lat_value,top_gain=top_gain_symbol,top_loss=top_loss_symbol,overall_gl=overall_gl)
+    else:
+        return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0)
