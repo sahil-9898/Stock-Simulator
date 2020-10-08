@@ -59,6 +59,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('changepass') }}">Change Password</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
                         </ul>
+                        <script id="gs-sdk" src='//www.buildquickbots.com/botwidget/v3/demo/static/js/sdk.js?v=3' key="f58a2472-a896-4713-be7c-d68f059f11f8" ></script>
                     {% else %}
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
@@ -80,6 +81,9 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+            
+
+
             <main>
                 {% block main %}{% endblock %}
             </main>
