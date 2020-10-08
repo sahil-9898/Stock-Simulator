@@ -55,7 +55,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a></li>
                         </ul>
                         <ul class="navbar-nav navbar-right">
-                            <li class="nav-item"><a class="nav-link" href=#><i class="fas fa-wallet"></i> : Cash</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{cash}}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('changepass') }}">Change Password</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
                         </ul>

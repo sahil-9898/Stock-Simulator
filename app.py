@@ -62,7 +62,7 @@ def index():
     rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     # cash = float("{:.2f}".format(rows[0]["cash"]))
     sum+=rows[0]["cash"]
-    return render_template("index.html", data=data, sum=rs(sum), cash=rs(rows[0]["cash"]))
+    return render_template("index.html", data=data, sum=rs(sum), cash=rows[0]["cash"])
     
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -86,7 +86,7 @@ def buy():
         return redirect(url_for("index"))
         
     else:
-        return render_template("buy.html")
+        return render_template("buy.html",)
 
 @app.route("/history")
 @login_required
@@ -280,7 +280,7 @@ def portfolio():
     share=list()
     price=list()
     latest=list()
-    # total=[]
+    rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
     sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
     pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
@@ -306,6 +306,19 @@ def portfolio():
         top_gain_symbol=symbol[top_gain_index]
         top_loss_symbol=symbol[top_loss_index]
         overall_gl=sum(gl)
-        return render_template("portfolio.html",data=data,lat_value=lat_value,top_gain=top_gain_symbol,top_loss=top_loss_symbol,overall_gl=overall_gl)
+        return render_template("portfolio.html",data=data,lat_value=lat_value,top_gain=top_gain_symbol,top_loss=top_loss_symbol,overall_gl=overall_gl,cash=rows[0]["cash"])
     else:
-        return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0)
+        return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0,cash=rows[0]["cash"])
+
+@app.route("/wallet", methods = ['GET', 'POST'])
+@login_required
+def wallet():
+    rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    if request.method=='POST':
+        amount=request.form.get("amount")
+        db.execute("UPDATE users SET cash=cash+ :amount WHERE id=:x",amount=amount,x=session["user_id"])
+        rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+        
+        return render_template("wallet.html",cash=rows[0]["cash"])
+    else:
+        return render_template("wallet.html",cash=rows[0]["cash"])
