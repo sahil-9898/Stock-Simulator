@@ -10,4 +10,4 @@ sanat
 1. Open cmd in the project window
 2. env\Scripts\activate
 3. flask run
-4. Copy the local host address in brower and enjoy.
+4. Copy the local host address in brower and enjoy...
