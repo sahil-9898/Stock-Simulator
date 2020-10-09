@@ -3,4 +3,5 @@ Flask-Session
 SQLAlchemy
 cs50
 nsetools
+gunicorn
 
