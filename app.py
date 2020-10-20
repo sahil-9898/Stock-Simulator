@@ -30,6 +30,8 @@ Session(app)
 
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
+
+
 success="Success"
 
 
