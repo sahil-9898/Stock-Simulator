@@ -31,10 +31,6 @@ Session(app)
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
-
-success="Success"
-
-
 @app.route("/")
 @login_required
 def index():
@@ -64,7 +60,8 @@ def index():
     rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     # cash = float("{:.2f}".format(rows[0]["cash"]))
     sum+=rows[0]["cash"]
-    return render_template("index.html", data=data, sum=rs(sum), cash=rows[0]["cash"])
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    return render_template("index.html", data=data, sum=rs(sum), cash=rows[0]["cash"], user=user[0]["username"])
     
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -142,7 +139,7 @@ def login():
         session["user_id"] = rows[0]["id"]
 
         # redirect user to home page
-        flash(success)
+        flash("success", "welcome")
         return redirect(url_for("index"))
 
     # else if user reached route via GET (as by clicking a link or via redirect)
@@ -167,8 +164,10 @@ def quote():
     if request.method == "POST":
         result = lookup(request.form.get("symbol"))
         if result is None:
-            return apology("invalid stock")
-        return render_template("quoted.html", name=result["name"], symbol=result["symbol"], price=result["price"])
+            flash("invalid stock!!", "error")
+            return render_template("quote.html")
+        else:
+            return render_template("quoted.html", name=result["name"], symbol=result["symbol"], price=result["price"])
     else:
       return render_template("quote.html")  
 
@@ -206,7 +205,6 @@ def register():
         result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
         if not result:
             return apology("username already exists")
-        flash(success)
         return redirect(url_for("login"))
 
     else:    
@@ -320,7 +318,7 @@ def wallet():
         amount=request.form.get("amount")
         db.execute("UPDATE users SET cash=cash+ :amount WHERE id=:x",amount=amount,x=session["user_id"])
         rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-        
+        flash("amount added", "success")
         return render_template("wallet.html",cash=rows[0]["cash"])
     else:
         return render_template("wallet.html",cash=rows[0]["cash"])

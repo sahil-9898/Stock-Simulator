@@ -34,33 +34,18 @@ def login_required(f):
     return decorated_function
 
 def lookup(symbol):
-    """Look up quote for symbol."""
-
-    # reject symbol if it starts with caret
-    if symbol.startswith("^"):
+    valid = nse.is_valid_code(symbol)
+    if valid == True:
+        price = stockdetails['buyPrice1']
+        if price==None:
+            price = stockdetails['lastPrice']
+        return {
+            "name": stockdetails['companyName'],
+            "price": price,
+            "symbol": symbol.upper()
+        }
+    else:
         return None
-
-    # reject symbol if it contains comma
-    if "," in symbol:
-        return None
-
-    # query nse for quote
-    try:
-        stockdetails=nse.get_quote(symbol)
-    except:
-        return None
-
-    # ensure stock exists
-    price = stockdetails['buyPrice1']
-    if price==None:
-        price = stockdetails['lastPrice']
-
-    # return stock's name (as a str), price (as a float), and (uppercased) symbol (as a str)
-    return {
-        "name": stockdetails['companyName'],
-        "price": price,
-        "symbol": symbol.upper()
-    }
 
 def rs(value):
     """Formats value as RUPPEE."""
