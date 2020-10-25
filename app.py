@@ -67,6 +67,7 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock."""
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     if request.method == "POST":
         stock = lookup(request.form.get("symbol"))
         if stock is None:
@@ -85,11 +86,12 @@ def buy():
         return redirect(url_for("index"))
         
     else:
-        return render_template("buy.html",)
+        return render_template("buy.html",user=user[0]["username"])
 
 @app.route("/history")
 @login_required
 def history():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     symbol=list()
     share=list()
     price=list()
@@ -108,7 +110,7 @@ def history():
     for i in range (len(tr)):
         transacted.append(tr[i]["transacted"])
     data = zip(symbol,share,price,transacted)
-    return render_template("history.html", data=data)
+    return render_template("history.html", data=data, user=user[0]["username"])
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -160,16 +162,16 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     if request.method == "POST":
         result = lookup(request.form.get("symbol"))
         if result is None:
             flash("invalid stock!!", "error")
             return render_template("quote.html")
         else:
-            return render_template("quoted.html", name=result["name"], symbol=result["symbol"], price=result["price"])
+            return render_template("quoted.html", name=result["name"], symbol=result["symbol"], price=result["price"], user=user[0]["username"])
     else:
-      return render_template("quote.html")  
+      return render_template("quote.html", user=user[0]["username"])  
 
     
 
@@ -214,6 +216,7 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     """Sell shares of stock."""
     if request.method == "POST":
         stock = lookup(request.form.get("symbol"))
@@ -236,12 +239,13 @@ def sell():
         return redirect(url_for("index"))
         
     else:
-        return render_template("sell.html")
+        return render_template("sell.html", user=user[0]["username"])
 
 
 @app.route("/changepass", methods=["GET", "POST"])
 @login_required
 def changepass():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     """Change password."""
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -272,11 +276,12 @@ def changepass():
         return redirect(url_for("index"))
 
     else:    
-        return render_template("changepass.html")
+        return render_template("changepass.html", user=user[0]["username"])
 
 @app.route("/portfolio")
 @login_required
 def portfolio():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     symbol=list()
     share=list()
     price=list()
@@ -307,19 +312,20 @@ def portfolio():
         top_gain_symbol=symbol[top_gain_index]
         top_loss_symbol=symbol[top_loss_index]
         overall_gl=sum(gl)
-        return render_template("portfolio.html",data=data,lat_value=lat_value,top_gain=top_gain_symbol,top_loss=top_loss_symbol,overall_gl=overall_gl,cash=rows[0]["cash"])
+        return render_template("portfolio.html",data=data,lat_value=lat_value,top_gain=top_gain_symbol,top_loss=top_loss_symbol,overall_gl=overall_gl,cash=rows[0]["cash"], user=user[0]["username"])
     else:
-        return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0,cash=rows[0]["cash"])
+        return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0,cash=rows[0]["cash"], user=user[0]["username"])
 
 @app.route("/wallet", methods = ['GET', 'POST'])
 @login_required
 def wallet():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     if request.method=='POST':
         amount=request.form.get("amount")
         db.execute("UPDATE users SET cash=cash+ :amount WHERE id=:x",amount=amount,x=session["user_id"])
         rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
         flash("amount added", "success")
-        return render_template("wallet.html",cash=rows[0]["cash"])
+        return render_template("wallet.html",cash=rows[0]["cash"], user=user[0]["username"])
     else:
-        return render_template("wallet.html",cash=rows[0]["cash"])
+        return render_template("wallet.html",cash=rows[0]["cash"], user=user[0]["username"])

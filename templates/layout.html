@@ -47,8 +47,15 @@
                         </ul>
                         <ul class="navbar-nav navbar-right">
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{cash}}</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('changepass') }}">Change Password</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log Out</a></li>
+                            <li class="nav-item">
+                                <div class="dropdown">
+                                    <button data-toggle="dropdown" class="userButton"><i class="fas fa-user-circle"></i> {{user}}</button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                      <a class="dropdown-item" href="{{ url_for('changepass') }}">Change Password</a>
+                                      <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                                    </div>
+                                </div>
+                            </li>
                         </ul>
                         <script id="gs-sdk" src='//www.buildquickbots.com/botwidget/v3/demo/static/js/sdk.js?v=3' key="f58a2472-a896-4713-be7c-d68f059f11f8" ></script>
                     {% else %}

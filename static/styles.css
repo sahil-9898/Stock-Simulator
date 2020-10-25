@@ -38,3 +38,9 @@ main td
     
     text-align: left;
 }
+.userButton{
+    background: transparent;
+    outline: none !important;
+    border: none;
+    height: 40px;
+}
