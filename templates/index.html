@@ -18,23 +18,23 @@
         <tfoot>
             <tr>
                 <td colspan="3"></td>
-                <td>{{sum}}</td>
+                <td>₹{{sum}}</td>
             </tr>
         </tfoot>
     {% for row in data %}
     <tr>
     {% for item in row %}
-    {% if item is not string and item>20%}
-        <td>₹{{ item }}</td>
-    {% else %}
+    {% if item is not number %}
         <td>{{ item }}</td>
+    {% else %}
+        <td>₹{{ item }}</td>
     {% endif %}
     {% endfor %}
     </tr>
     {% endfor %}
     <tr>
       <td colspan="3">CASH</td>
-      <td>{{cash}}</td>
+      <td>₹{{cash}}</td>
     </tr>
 </table>
 {% endblock %}

@@ -36,6 +36,7 @@ def login_required(f):
 def lookup(symbol):
     valid = nse.is_valid_code(symbol)
     if valid == True:
+        stockdetails=nse.get_quote(symbol)
         price = stockdetails['buyPrice1']
         if price==None:
             price = stockdetails['lastPrice']

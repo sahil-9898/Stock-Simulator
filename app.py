@@ -56,12 +56,12 @@ def index():
     for i in range(len(total)):
         sum+=total[i]
     for i in range(len(total)):
-        total[i]=rs(total[i])
+        total[i]=str(total[i])
     rows = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     # cash = float("{:.2f}".format(rows[0]["cash"]))
     sum+=rows[0]["cash"]
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    return render_template("index.html", data=data, sum=rs(sum), cash=rows[0]["cash"], user=user[0]["username"])
+    return render_template("index.html", data=data, sum=sum, cash=rows[0]["cash"], user=user[0]["username"])
     
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -205,7 +205,8 @@ def register():
         result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
         if not result:
             return apology("username already exists")
-        return redirect(url_for("login"))
+        flash("New user registered", "success")
+        return render_template("login.html")
 
     else:    
         return render_template("register.html")
