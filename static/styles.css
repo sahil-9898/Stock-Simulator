@@ -1,25 +1,40 @@
+/*//////////////////////////////////////////////////////////////////
+[ FONT ]*/
+
+@font-face {
+    font-family: OpenSans-Regular;
+    src: url('fonts/OpenSans/OpenSans-Regular.ttf'); 
+  }
+  
+  @font-face {
+    font-family: OpenSans-ExtraBold;
+    src: url('fonts/OpenSans/OpenSans-ExtraBold.ttf'); 
+  }
+  
+  @font-face {
+    font-family: OpenSans-Bold;
+    src: url('fonts/OpenSans/OpenSans-Bold.ttf'); 
+  }
+  
+  @font-face {
+    font-family: OpenSans-SemiBold;
+    src: url('fonts/OpenSans/OpenSans-SemiBold.ttf'); 
+  }
+body{
+    padding-top: 125px;
+    font-family: OpenSans-Regular !important;
+}
 .container
 {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
 }
-.navbar-light .navbar-brand
-{
-    color: #537fbe;
+nav.navbar.navbar-expand-lg.navbar-light.fixed-top {
+    padding: 0 5.75rem;
+    background: white;
 }
-.navbar-default .navbar-brand .red
-{
-    color: #ea433b;
-}
-.navbar-default .navbar-brand .yellow
-{
-    color: #f5b82e;
-}
-.navbar-default .navbar-brand .green
-{
-    color: #2e944b;
-}
+
 
 main .form-control
 {
@@ -36,11 +51,61 @@ main img
 main td
 {
     
-    text-align: left;
+    text-align: center;
+}
+h5{
+    color: #22000c;
+    font-family: "OpenSans-Regular";
+    text-align: center;
+}
+h6{
+    text-align: center;
+}
+/*Style the counter cards*/
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); 
+    padding: 16px;
+    text-align: center;
+    background-color: #f1f1f1;
+}
+.card-header{
+    font-family: OpenSans-Bold;
+}
+.card-text{
+    font-family: OpenSans-SemiBold;
 }
 .userButton{
     background: transparent;
     outline: none !important;
     border: none;
     height: 40px;
+    text-transform: uppercase;
+}
+.logo{
+    max-width: 50px;
+}
+.category-nav {
+    display: inline-flex;
+    width: 100%;
+    background: #4e5ec3;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 60px;
+    z-index: 100;
+}
+.category-nav-link {
+    background: none;
+    border: none;
+    outline: none;
+    width: 150px;
+}
+.category-nav-link a {
+    color: white;
+    text-decoration: none;
+}
+.category-nav-link a:hover{
+    color: white;
+    text-decoration: none;
 }

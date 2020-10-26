@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 
 <html lang="en">
-
+    
     <head>
 
-        
         <meta charset="utf-8"/>
+        
         <meta content="initial-scale=1, width=device-width" name="viewport"/>
 
         <link rel="icon" type="image/png" href="static/images/icons/favicon.ico"/>
 
-        <link rel="stylesheet" href="{{ url_for('static', filename='alert.css') }}">
+        <link rel="stylesheet" href="static/css/alert.css">
         <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
@@ -22,54 +22,58 @@
         <title>Stock Simulator: {% block title %}{% endblock %}</title>
 
     </head>
-    <style>
-        body{
-            padding-top:70px;
-        }
-    </style>
-
     <body>
         <!---------------------------------------NAVBAR-------------------------------------->
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+            <a class="navbar-brand blue" href="{{ url_for('index') }}"><img src="static/images/risk.png" class="logo">Stock Simulator</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                {% if session.user_id %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{cash}}</a></li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button data-toggle="dropdown" class="userButton"><i class="fas fa-user-circle"></i> {{user}}</button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{ url_for('changepass') }}">Change Password</a>
+                                <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <script id="gs-sdk" src='//www.buildquickbots.com/botwidget/v3/demo/static/js/sdk.js?v=3' key="f58a2472-a896-4713-be7c-d68f059f11f8" ></script>
+                {% else %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log In</a></li>
+                </ul>
+                {% endif %}
+            </div>
+        </nav>
+        <nav class="category-nav">
+            <button class="category-nav-link">
+                <a href="{{ url_for('quote') }}">Quote</a>
+            </button>
+            <button class="category-nav-link">
+                <a href="{{ url_for('buy') }}">Buy</a>
+            </button>
+            <button class="category-nav-link">
+                <a href="{{ url_for('sell') }}">Sell</a>
+            </button>
+            <button class="category-nav-link">
+                <a href="{{ url_for('history')}}">History</a>
+            </button>
+            <button class="category-nav-link">
+                <a href="{{ url_for('portfolio')}}">Portfolio</a>
+            </button>
+        </nav>
+        
+        <!----------------------------NAVBAR END---------------------------------->
+
         <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-                <a class="navbar-brand blue" href="{{ url_for('index') }}">Stock Simulator</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    {% if session.user_id %}
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('quote') }}">Quote</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('buy') }}">Buy</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('sell') }}">Sell</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('history') }}">History</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a></li>
-                        </ul>
-                        <ul class="navbar-nav navbar-right">
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{cash}}</a></li>
-                            <li class="nav-item">
-                                <div class="dropdown">
-                                    <button data-toggle="dropdown" class="userButton"><i class="fas fa-user-circle"></i> {{user}}</button>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                      <a class="dropdown-item" href="{{ url_for('changepass') }}">Change Password</a>
-                                      <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <script id="gs-sdk" src='//www.buildquickbots.com/botwidget/v3/demo/static/js/sdk.js?v=3' key="f58a2472-a896-4713-be7c-d68f059f11f8" ></script>
-                    {% else %}
-                        <ul class="navbar-nav ml-auto">
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Log In</a></li>
-                        </ul>
-                    {% endif %}
-                </div>
-            </nav>
-            <!----------------------------NAVBAR END---------------------------------->
-
-
-
+            
             <!----------------------------ALERTS--------------------------------------->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}

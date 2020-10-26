@@ -5,34 +5,12 @@
 {% endblock %}
 
 {% block main %}
-<style type="text/css">
-
-    h2 {
-        color: black;
-        font-size: larger;
-    }
-
-    h5{
-        color: #22000c;
-        font-family: "Agency FB";
-        font-size: larger;
-        text-align: center;
-    }
-    /*Style the counter cards*/
-    .card {
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); 
-        padding: 16px;
-        text-align: center;
-        background-color: #f1f1f1;
-    }
-    
-</style>
 
 <div class="jumbotron card card-image" style="background-image: url(https://mdbootstrap.com/img/Photos/Others/gradient1.jpg)">
     <div class="card-deck">
         <div class="card" style="width: 17rem">
             <div class="card-header">
-                <h2>LATEST VALUE</h2>
+                LATEST VALUE
             </div>
             <div class="card-body"  >
                 <p class="card-text">₹{{ "%.2f"|format(lat_value)}}</p>
@@ -40,7 +18,7 @@
         </div>
         <div class="card" style="width: 17rem">
             <div class="card-header">
-                <h2>TOP GAINERS/LOSSERS</h2>
+                TOP GAINERS/LOSSERS
             </div>
             <div class="card-body" >
                 <p class="card-text"><span style="font-size:15px;color:green">{{top_gain}}</span><br><span style="font-size:15px;color:crimson">{{top_loss}}</span></p>
@@ -48,7 +26,7 @@
         </div>
         <div class="card" style="width: 17rem">
             <div class="card-header">
-                <h2>OVERALL  GAIN/LOSS</h2>
+                OVERALL  GAIN/LOSS
             </div>
             <div class="card-body" >
                 <p class="card-text">₹{{"%.2f"|format(overall_gl)}}</p>
@@ -62,17 +40,17 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th><h2>Stock<br>Quantity<br>Buy Price</h2></th>
-            <th><h2>Invested Amount</h2></th>
-            <th><h2>Latest Value<br>Day's G/L</h2></th>
+            <th><h5>Stock<br>Quantity<br>Buy Price</h5></th>
+            <th><h5>Invested Amount</h5></th>
+            <th><h5>Latest Value<br>Day's G/L</h5></th>
         </tr>
         </thead>
         <tbody>
         {% for row in data %}
         <tr>
-            <td><h5><span style="font-size:25px;color: blueviolet">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h5></td>
-            <td><h5><br>₹{{row[1]*row[2]}}</h5></td>
-            <td><h5>₹{{row[3]}}<br>₹{{ "%.2f"|format((row[3]-row[2])*row[1])}}</h5></td>
+            <td><h6><span style="font-size:25px;color: blueviolet">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h6></td>
+            <td><h6><br>₹{{row[1]*row[2]}}</h6></td>
+            <td><h6>₹{{row[3]}}<br>₹{{ "%.2f"|format((row[3]-row[2])*row[1])}}</h6></td>
         </tr>
         {% endfor %}
         </tbody>
