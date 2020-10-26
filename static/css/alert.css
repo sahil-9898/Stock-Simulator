@@ -46,6 +46,7 @@
 	 border-radius: 20px;
 	 box-shadow: 5px 5px 20px rgba(203, 205, 211, 10);
 	 perspective: 40px;
+	 z-index: 999;
 }
  #error-box {
 	 position: absolute;
@@ -56,6 +57,7 @@
 	 background: linear-gradient(to bottom left, #ef8d9c 40%, #ffc39e 100%);
 	 border-radius: 20px;
 	 box-shadow: 5px 5px 20px rgba(203, 205, 211, 10);
+	 z-index: 999;
 }
  .dot {
 	 width: 8px;

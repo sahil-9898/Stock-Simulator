@@ -21,7 +21,7 @@
     src: url('fonts/OpenSans/OpenSans-SemiBold.ttf'); 
   }
 body{
-    padding-top: 125px;
+    padding-top: 127px;
     font-family: OpenSans-Regular !important;
 }
 .container
@@ -30,9 +30,62 @@ body{
     margin-right: auto;
     text-align: center;
 }
-nav.navbar.navbar-expand-lg.navbar-light.fixed-top {
+nav.navbar.navbar-expand-lg.fixed-top {
     padding: 0 5.75rem;
     background: white;
+}
+.logo{
+    max-width: 50px;
+}
+a.navbar-brand {
+    color: #4e5ec3;
+    font-family: OpenSans-Bold;
+    font-size: 2em;
+}
+a.nav-link {
+    color: black;
+    font-family: OpenSans-SemiBold;
+    font-size: 1.2em;
+}
+.userButton{
+    background: transparent;
+    outline: none !important;
+    border: none;
+    height: 45px;
+    text-transform: uppercase;
+    font-family: OpenSans-Semibold;
+    font-size: 1.2em;
+}
+
+.category-nav {
+    display: inline-flex;
+    width: 100%;
+    background: #4e5ec3;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 62px;
+    z-index: 100;
+}
+.category-nav-link {
+    background: none;
+    border: none;
+    outline: none;
+    width: 150px;
+}
+button.category-nav-link:focus {
+    outline: none;
+    border: none;
+}
+.category-nav-link a {
+    color: white;
+    text-decoration: none;
+    font-family: OpenSans-SemiBold;
+}
+.category-nav-link a:hover{
+    color: white;
+    text-decoration: none;
 }
 
 
@@ -74,38 +127,4 @@ h6{
 .card-text{
     font-family: OpenSans-SemiBold;
 }
-.userButton{
-    background: transparent;
-    outline: none !important;
-    border: none;
-    height: 40px;
-    text-transform: uppercase;
-}
-.logo{
-    max-width: 50px;
-}
-.category-nav {
-    display: inline-flex;
-    width: 100%;
-    background: #4e5ec3;
-    height: 30px;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 60px;
-    z-index: 100;
-}
-.category-nav-link {
-    background: none;
-    border: none;
-    outline: none;
-    width: 150px;
-}
-.category-nav-link a {
-    color: white;
-    text-decoration: none;
-}
-.category-nav-link a:hover{
-    color: white;
-    text-decoration: none;
-}
+
