@@ -133,11 +133,6 @@
                     <div class="message"><span class="alertType">Error!</span><p class="alertMsg">{{message}}</div>
                     <button class="button-box" data-dismiss="alert"><span class="red alertButton">try again</span></button>
                 </div>
-                <script>
-                    setTimeout(function() {
-                    $('#error-box').fadeOut('fast');
-                    }, 2000);
-                </script>
             {% elif category == "welcome" %}
                 <div class="welcome">
                     <p id="welcomeAlert">Welcome {{user}}</p>
