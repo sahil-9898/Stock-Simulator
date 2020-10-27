@@ -30,6 +30,10 @@ body{
     margin-right: auto;
     text-align: center;
 }
+.jumbotron.card.card-image{
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
 nav.navbar.navbar-expand-lg.fixed-top {
     padding: 0 5.75rem;
     background: white;
@@ -107,11 +111,11 @@ main td
     text-align: center;
 }
 h5{
-    color: #22000c;
-    font-family: "OpenSans-Regular";
+    font-family: "OpenSans-SemiBold";
     text-align: center;
 }
 h6{
+    font-family: OpenSans-SemiBold;
     text-align: center;
 }
 /*Style the counter cards*/
@@ -127,4 +131,27 @@ h6{
 .card-text{
     font-family: OpenSans-SemiBold;
 }
+
+.down {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid #FD5D5D;
+  padding: 0;
+  margin: 4px 3px;
+  position: absolute;
+}
+.up{
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 12px solid #2DC7B6;
+    padding: 0;
+    margin: 3px 3px;
+    position: absolute;
+}
+
+  
 

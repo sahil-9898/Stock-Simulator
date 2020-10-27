@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session,url_for
+from flask import Flask, flash, redirect, render_template, request, session,url_for,jsonify
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
@@ -353,3 +353,33 @@ def wallet():
             return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
     else:
         return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
+
+
+@app.route("/stuff", methods = ['GET', 'POST'])
+@login_required
+def stuff():
+    latest=list()
+    share=list()
+    price=list()
+    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
+    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
+    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])   
+    if len(sy)!=0:
+        for i in range (len(sy)):
+            prc=lookup(sy[i]["symbol"])
+            latest.append(prc["price"])
+        for i in range (len(sh)):
+            share.append(sh[i]["shares"])  
+        for i in range (len(pr)):
+            price.append(pr[i]["price"])
+        inv_amt=list()
+        gl=list()
+        for i in range (len(sy)):
+            glst = (latest[i]-price[i])*share[i]
+            gl.append(float("%.2f" % glst))
+            inv_amt.append(price[i]*share[i])
+        tot_inv=float("%.2f" % sum(inv_amt))
+        overall_gl=sum(gl)
+        lat_value=tot_inv + overall_gl
+        
+        return jsonify(latest, gl, lat_value, overall_gl)

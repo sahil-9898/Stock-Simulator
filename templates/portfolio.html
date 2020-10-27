@@ -13,7 +13,7 @@
                 LATEST VALUE
             </div>
             <div class="card-body"  >
-                <p class="card-text">₹{{ "%.2f"|format(lat_value)}}</p>
+                <p class="card-text" id = "lat_value">₹{{ "%.2f"|format(lat_value)}}</p>
             </div>
         </div>
         <div class="card" style="width: 17rem">
@@ -21,7 +21,7 @@
                 TOP GAINERS/LOSSERS
             </div>
             <div class="card-body" >
-                <p class="card-text"><span style="font-size:15px;color:green">{{top_gain}}</span><br><span style="font-size:15px;color:crimson">{{top_loss}}</span></p>
+                <p class="card-text"><span style="font-size:15px;color:#2dc7b6">{{top_gain}}</span><br><span style="font-size:15px;color:#fd5d5d">{{top_loss}}</span></p>
             </div>
         </div>
         <div class="card" style="width: 17rem">
@@ -29,7 +29,7 @@
                 OVERALL  GAIN/LOSS
             </div>
             <div class="card-body" >
-                <p class="card-text">₹{{"%.2f"|format(overall_gl)}}</p>
+                <p class="card-text" id="overall_gl">₹{{"%.2f"|format(overall_gl)}}</p>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
 
 <div class="container">
 
-    <table class="table table-striped">
+    <table class="table table-striped table-borderless">
         <thead>
         <tr>
             <th><h5>Stock<br>Quantity<br>Buy Price</h5></th>
@@ -48,13 +48,48 @@
         <tbody>
         {% for row in data %}
         <tr>
-            <td><h6><span style="font-size:25px;color: blueviolet">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h6></td>
+            <td><h6><span style="font-size:25px;color: #4e5ec3">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h6></td>
             <td><h6><br>₹{{row[1]*row[2]}}</h6></td>
-            <td><h6>₹{{row[3]}}<br>₹{{ "%.2f"|format((row[3]-row[2])*row[1])}}</h6></td>
+            <td><h6>₹<span class = "latest">{{row[3]}}</span><br>₹<span class="gl">{{ "%.2f"|format((row[3]-row[2])*row[1])}}</span><span class="up"></span><span class="down"></span></h6></td>
         </tr>
         {% endfor %}
+        
         </tbody>
     </table>
 
 </div>
+<script>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    var intervalId = setInterval(update_values, 3000);
+    function update_values(){
+        $.getJSON($SCRIPT_ROOT + '/stuff', 
+        function(data){
+            var latest = data[0];
+            var gl = data[1];
+            
+            console.log(latest);
+            $("#overall_gl").text('₹' + data[3]);
+            $("#lat_value").text("₹" + data[2]);
+            var n=$(".gl").length;
+            for(var i=0;i<n;i++){
+                var gl_element = $(".gl:eq("+ i +")");
+                var lat_element = $(".latest:eq("+ i +")");
+                gl_element.text(gl[i]);
+                lat_element.text(latest[i]);
+
+                if(gl_element.text()>0){
+                    gl_element.css("color", "#2dc7b6");
+                    $(".up:eq("+ i +")").show();
+                    $(".down:eq("+ i +")").hide();
+                }
+                else{
+                    gl_element.css("color", "#fd5d5d");
+                    $(".up:eq("+ i +")").hide();
+                    $(".down:eq("+ i +")").show();    
+                }
+            }
+        });
+    };
+    
+</script>
 {% endblock %}
