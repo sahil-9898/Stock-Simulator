@@ -15,8 +15,21 @@
     </thead>
     <tr>
         <td>{{name}}</td>
-        <td>{{symbol}}</td>
-        <td>₹{{price}}</td>
+        <td id="symbol">{{symbol}}</td>
+        <td id="price">₹{{price}}</td>
     </tr>
     </table>
+
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    var intervalId = setInterval(update_values, 3000);
+    function update_values(){
+        $.getJSON($SCRIPT_ROOT + '/update_quote',{
+            symbol: $('#symbol').text()
+        }, 
+        function(data) {
+            $("#price").text("₹"+data);
+        });
+    };       
+</script>
 {% endblock %}

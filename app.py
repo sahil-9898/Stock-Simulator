@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import *
+from helpers import lookup,login_required
 
 # configure application
 app = Flask(__name__)
@@ -20,7 +20,7 @@ if app.config["DEBUG"]:
         return response
 
 # custom filter
-app.jinja_env.filters["rs"] = rs
+#app.jinja_env.filters["rs"] = rs
 
 # configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
@@ -130,14 +130,6 @@ def login():
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # ensure username was submitted
-        if not request.form.get("username"):
-            return apology("must provide username")
-
-        # ensure password was submitted
-        elif not request.form.get("password"):
-            return apology("must provide password")
-
         # query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
 
@@ -160,9 +152,9 @@ def login():
 @app.route("/logout")
 def logout():
     """Log user out."""
-    
     # forget any user_id
     session.clear()
+    
 
     # redirect user to login form
     return redirect(url_for("login"))
@@ -183,7 +175,13 @@ def quote():
     else:
       return render_template("quote.html", user=user[0]["username"], cash=cash[0]["cash"])  
 
-    
+@app.route("/update_quote", methods = ["GET", "POST"])
+@login_required
+def update_quote():
+    symbol = request.args.get('symbol')
+    temp=lookup(symbol)
+    price=temp["price"]
+    return jsonify(price)   
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -197,27 +195,17 @@ def register():
         username=request.form.get("username")
         password=request.form.get("password")
         password2=request.form.get("password2")
-
-        # ensure username was submitted
-        if not username:
-            return apology("must provide username")
-
-        # ensure password was submitted
-        elif not password:
-            return apology("must provide password")
-            
-        elif not password2:
-            return apology("must re-enter password")
-            
+    
         if password!=password2:
-             return apology("passwords do not match")
+            flash("Passwords do not match", "error")
+            return render_template("register.html")
         
         hash = generate_password_hash(password)
-        
-        result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
-        if not result:
+        try:
+            db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
+        except:
             flash("Username Already Exists", "error")
-            return redirect(url_for("register"))
+            return render_template("register.html")
         flash("New user registered", "success")
         return render_template("login.html")
 
@@ -266,17 +254,6 @@ def changepass():
     """Change password."""
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-
-        # ensure username was submitted
-        if not request.form.get("oldpass"):
-            return apology("must provide current password")
-        
-        # ensure password was submitted
-        elif not request.form.get("newpass"):
-            return apology("must provide new password")
-            
-        elif not request.form.get("newpass2"):
-            return apology("must re-enter new password")
         
         oldpasscheck = db.execute("SELECT hash FROM users WHERE id = :id", id= session['user_id'])
         
@@ -355,9 +332,9 @@ def wallet():
         return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
 
 
-@app.route("/stuff", methods = ['GET', 'POST'])
+@app.route("/update_portfolio", methods = ['GET', 'POST'])
 @login_required
-def stuff():
+def update_portfolio():
     latest=list()
     share=list()
     price=list()
@@ -383,3 +360,5 @@ def stuff():
         lat_value=tot_inv + overall_gl
         
         return jsonify(latest, gl, lat_value, overall_gl)
+    else:
+        return "-1"

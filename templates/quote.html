@@ -8,11 +8,12 @@
     <form action="{{ url_for('quote') }}" method="post">
         <fieldset>
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol" type="text"/>
+                <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Symbol" type="text" required/>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" type="submit">Quote</button>
             </div>
         </fieldset>
     </form>
+
 {% endblock %}

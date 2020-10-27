@@ -58,38 +58,52 @@
     </table>
 
 </div>
-<script>
+<!--------------------------------UPDATING VALUES------------------------------>
+<script type=text/javascript>
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     var intervalId = setInterval(update_values, 3000);
     function update_values(){
-        $.getJSON($SCRIPT_ROOT + '/stuff', 
+        $.getJSON($SCRIPT_ROOT + '/update_portfolio', 
         function(data){
-            var latest = data[0];
-            var gl = data[1];
+            if(data == -1){
+                clearInterval(intervalId);
+                return(-1)
+            }
+            else{
+                var latest = data[0];
+                var gl = data[1];
             
-            console.log(latest);
-            $("#overall_gl").text('₹' + data[3]);
-            $("#lat_value").text("₹" + data[2]);
-            var n=$(".gl").length;
-            for(var i=0;i<n;i++){
-                var gl_element = $(".gl:eq("+ i +")");
-                var lat_element = $(".latest:eq("+ i +")");
-                gl_element.text(gl[i]);
-                lat_element.text(latest[i]);
-
-                if(gl_element.text()>0){
-                    gl_element.css("color", "#2dc7b6");
-                    $(".up:eq("+ i +")").show();
-                    $(".down:eq("+ i +")").hide();
+                $("#overall_gl").text('₹' + data[3]);
+                if(data[3]>0){
+                    $("#overall_gl").css("color", "#2dc7b6");
                 }
                 else{
-                    gl_element.css("color", "#fd5d5d");
-                    $(".up:eq("+ i +")").hide();
-                    $(".down:eq("+ i +")").show();    
+                    $("#overall_gl").css("color", "#fd5d5d");
+                }
+                $("#lat_value").text("₹" + data[2]);
+                var n=$(".gl").length;
+                for(var i=0;i<n;i++){
+                    var gl_element = $(".gl:eq("+ i +")");
+                    var lat_element = $(".latest:eq("+ i +")");
+                    gl_element.text(gl[i]);
+                    lat_element.text(latest[i]);
+
+                    if(gl_element.text()>0){
+                        gl_element.css("color", "#2dc7b6");
+                        $(".up:eq("+ i +")").show();
+                        $(".down:eq("+ i +")").hide();
+                    }
+                    else{
+                        gl_element.css("color", "#fd5d5d");
+                        $(".up:eq("+ i +")").hide();
+                        $(".down:eq("+ i +")").show();    
+                    }
                 }
             }
+            
         });
     };
     
 </script>
+<!----------------------------------------------------------------->
 {% endblock %}
