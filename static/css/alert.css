@@ -214,7 +214,8 @@
     background: linear-gradient(to bottom right, #b0db7d 40%, #99dbb4 100%);
     height: 56px;
     width: 250px;
-    border-radius: 10px;
+	border-radius: 10px;
+	z-index: 999;
 }
 #welcomeAlert{
     margin: 16px auto;

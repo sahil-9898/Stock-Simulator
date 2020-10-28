@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+<div class = "conatainer">
     <form action="{{ url_for('changepass') }}" method="post">
         <fieldset>
             <div class="form-group">
@@ -21,4 +22,5 @@
             </div>
         </fieldset>
     </form>
+</div>
 {% endblock %}

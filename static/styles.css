@@ -153,5 +153,39 @@ h6{
     position: absolute;
 }
 
+.widget-container{
+    max-width: 1450px;
+    margin: 0 auto;
+    padding-top:20px;
+}
+.tradingview-widget-container{
+    position: fixed;
+    top: 92px;
+    background:white;
+    z-index: 100;
+}
+.carousel-control-next,
+.carousel-control-prev{
+    display:block;
+    color:#036!important;
+    margin-left: -.5rem;
+    z-index: 1
+}
+.carousel-control-prev:hover,
+.carousel-control-next:hover{
+  color:black;
+}
+.media-body a:hover,
+.carousel-item a:hover{
+    color: #357ebd!important;
+}
+.carousel-indicators li {
+    width: 5px!important;
+    height: 5px!important;
+    border-radius: 100% !important;
+    background-color: #036!important;
+}
+
+
   
 

@@ -5,36 +5,203 @@
 {% endblock %}
 
 {% block main %}
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Symbol</th>
-            <th>Shares</th>
-            <th>Price</th>
-            <th>TOTAL</th>
-        </tr>
-        </thead>
-            <tfoot>
-                <tr>
-                    <td colspan="3"></td>
-                    <td>₹{{sum}}</td>
-                </tr>
-            </tfoot>
-        {% for row in data %}
-        <tr>
-        {% for item in row %}
-        {% if item is not number %}
-            <td>{{ item }}</td>
-        {% else %}
-            <td>₹{{ item }}</td>
-        {% endif %}
-        {% endfor %}
-        </tr>
-        {% endfor %}
-        <tr>
-          <td colspan="3">CASH</td>
-          <td>₹{{cash}}</td>
-        </tr>
-    </table>
 
+<!------------------------- STOCK TICKER ---------------------------->
+<div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+    {
+    "symbols": [
+      {
+        "description": "",
+        "proName": "BSE:HDFC"
+      },
+      {
+        "description": "",
+        "proName": "BSE:ICICIBANK"
+      },
+      {
+        "description": "INFOSYS",
+        "proName": "BSE:INFY"
+      },
+      {
+        "description": "KOTAK MAHINDRA",
+        "proName": "BSE:KOTAKBANK"
+      },
+      {
+        "description": "",
+        "proName": "BSE:BHARTIARTL"
+      },
+      {
+        "description": "",
+        "proName": "BSE:SENSEX"
+      },
+      {
+        "description": "",
+        "proName": "BSE:NTPC"
+      },
+      {
+        "description": "",
+        "proName": "BSE:ONGC"
+      },
+      {
+        "description": "",
+        "proName": "BSE:RELIANCE"
+      },
+      {
+        "description": "SBI",
+        "proName": "BSE:SBIN"
+      },
+      {
+        "description": "",
+        "proName": "BSE:TATASTEEL"
+      },
+      {
+        "description": "",
+        "proName": "BSE:TCS"
+      },
+      {
+        "description": "",
+        "proName": "BSE:TITAN"
+      }
+        ],
+        "colorTheme": "light",
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "locale": "in"
+    }
+    </script>
+</div>
+<!------------------------- STOCK TICKER END --------------------->
+
+<div class="container" style="padding-top:20px;">
+  <!---------------------CAROUSAL---------------------------------->
+  <div class="carousel" style="background-color: azure;margin-top: 20px">
+      <div id="cslide" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner" role="listbox">
+              <ol class="carousel-indicators " style="bottom: -20px">
+                  <li data-target="#cslide" data-slide-to="0" class="active"></li>
+                  <li data-target="#cslide" data-slide-to="1"></li>
+                  <li data-target="#cslide" data-slide-to="2"></li>
+              </ol>
+
+              <div class="carousel-item active text-center p-4">
+                  <h5><a target = "_blank" href="https://economictimes.indiatimes.com/sensex-nifty-live-today-2020-10-28/liveblog/78902759.cms" class="stretched-link" style="color: black;text-decoration: none">
+                      Traders' Diary: Fresh selling could emerge towards 11,550-11,500 zone
+                  </a></h5>
+                  <p>
+                      Financials and RIL lead the market fall as 25 of 30 Sensex stocks end the day in the red.
+                  </p>
+              </div>
+
+              <div class="carousel-item text-center p-4">
+                  <h5><a target = "_blank" href="https://www.businesstoday.in/current/corporate/airbnb-to-make-most-high-profile-stock-
+                  market-debut-plans-to-list-shares-on-nasdaq/story/420112.html" class="stretched-link" style="color: black;text-decoration: none">
+                      Airbnb to make most-high profile stock market debut; plans to list shares on Nasdaq
+                  </a></h5>
+                  <p>
+                      Earlier this month, the company was aiming to raise $3 billion in its IPO, which could give it
+                      a valuation of more than $30 billion, and that it was ...
+                  </p>
+              </div>
+
+              <div class="carousel-item text-center p-4">
+                  <h5><a target = "_blank" href="https://www.bloombergquint.com/markets/india-stocks-seen-reaping-2-5-billion-inflow-on-
+                  msci-changes" class="stretched-link" style="color: black;text-decoration: none">
+                      India Stocks May Reap $2.5 Billion Inflow on MSCI Index Changes
+                  </a></h5>
+                  <p>
+                      India's stock market will see a net inflow of about $2.5 billion from the next round of changes
+                      to MSCI Inc.'s indexes, according to Morgan ...
+                  </p>
+              </div>
+          </div>
+          <a target = "_blank" class="carousel-control-prev" href="#cslide" role="button" data-slide="prev" style="left: -65px">
+              <span class="fas fa-chevron-circle-left fa-x" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+          </a>
+          <a target = "_blank" class="carousel-control-next" href="#cslide" role="button" data-slide="next" style="right: -70px">
+              <span class="fas fa-chevron-circle-right fa-x" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+          </a>
+      </div>
+  </div>
+  <!-----------------------CAROUSAL END---------------------------------->
+
+
+  <!-------------------------NEWS-------------------------------->
+  <p><h2 style="text-align: center;margin-bottom: 20px;font-family:OpenSans-SemiBold">TOP STORIES</h2>
+
+  <div class="media position-relative" style="margin-bottom: 20px">
+      <img alt="MoneyControl" src="https://images.moneycontrol.com/images/common/header/logo.png?v=0.2&impolicy=mchigh" width="75" height="50" class="mr-3">
+      <div class="media-body">
+          <h5><a target = "_blank" href="https://www.moneycontrol.com/news/business/markets/share-market-live-updates-stock-market-today-
+          october-28-latest-news-bse-nse-sensex-nifty-bharti-airtel-hfcl-network18-media-investments-jump-networks-6026031.html"
+                 class="stretched-link" style="color: black;text-decoration: none">
+             Closing Bell: Nifty ends below 11,750, Sensex cracks 600 pts led by financials
+          </a></h5>
+          <p>
+              Follow our LIVE blog for the latest updates on the novel coronavirus pandemic and its impact. October 28,
+              2020 04:49 PM IST. Taking Stock: ...
+          </p>
+
+      </div>
+  </div>
+
+  <div class="media position-relative" style="margin-bottom: 20px">
+      <img alt="EconomicTimes" src="https://images-na.ssl-images-amazon.com/images/I/610xV0rT8kL._AC_UL600_SR600,600_.png" width="75" height="50" class="mr-3">
+      <div class="media-body">
+          <h5><a target = "_blank" href="https://economictimes.indiatimes.com/markets/expert-view/3-stocks-to-buy-if-the-market-corrects-
+          further-deven-choksey/articleshow/78885575.cms" class="stretched-link" style="color: black;text-decoration: none">
+              3 stocks to buy if the market corrects from here
+          </a></h5>
+          <p>
+              HDFC, Cipla and Bajaj Auto are some of the stocks we would be adding on dips, says Deven Choksey.
+          </p>
+      </div>
+  </div>
+
+  <div class="media position-relative" style="margin-bottom: 20px">
+      <img alt="EconomicTimes" src="https://images-na.ssl-images-amazon.com/images/I/610xV0rT8kL._AC_UL600_SR600,600_.png" width="75" height="50" class="mr-3">
+      <div class="media-body">
+          <h5><a target = "_blank" href="https://economictimes.indiatimes.com/markets/stocks/news/yes-bank-a-multibagger-in-the-making-or
+          -a-trap-for-investors/articleshow/78909217.cms" class="stretched-link" style="color: black;text-decoration: none">
+              YES Bank a multibagger in the making or a trap for investors?
+          </a></h5>
+          <p>
+             Investors hunting multibaggers on Dalal Street are eyeing the stock keenly, as it traded just a fraction
+              above its previous high.
+          </p>
+      </div>
+  </div>
+
+  <div class="media position-relative" style="margin-bottom: 20px">
+      <img alt="LiveMint" src="https://pbs.twimg.com/profile_images/1303221636745760768/jhoXTzaw.jpg" width="75" height="50"  class="mr-3">
+      <div class="media-body">
+          <h5><a target = "_blank" href="https://www.livemint.com/market/stock-market-news/stocks-to-watch-icici-bank-bharti-airtel-hero
+          -motocorp-tata-motors-vedanta-11603850662803.html" class="stretched-link" style="color: black;text-decoration: none">
+             Stocks to Watch: ICICI Bank, Bharti Airtel, Hero MotoCorp, Tata Motors, Vedanta
+          </a></h5>
+          <p>
+              NEW DELHI : Here's a list of top ten stocks that may be in news on Wednesday: Bharti Airtel: The country's
+              second largest telecom operator ...
+          </p>
+      </div>
+  </div>
+
+  <div class="media position-relative" style="margin-bottom: 20px">
+      <img alt="LiveMint" src="https://sc.cnbcfm.com/applications/cnbc.com/staticcontent/img/cnbc_logo.gif?v=1524171804" width="75" height="50"  class="mr-3">
+      <div class="media-body">
+          <h5><a target = "_blank" href="https://www.cnbctv18.com/market/stocks/stock-market-live-sensex-nifty-likely-to-open-lower-tata-
+          motors-bharti-airtel-icici-bank-in-focus-7319481.htm" class="stretched-link" style="color: black;text-decoration: none">
+             Stock Market Highlights: Sensex ends below 40,000, Nifty at 11,729; HDFC, RIL drag the most
+          </a></h5>
+          <p>
+              Stock Market Highlights: The Indian equity markets closed over a percent lower, breaking the 40,000 level
+              of Sensex and Nifty's 11,800 point.
+          </p>
+      </div>
+  </div>
+
+</div>
 {% endblock %}

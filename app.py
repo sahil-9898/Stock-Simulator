@@ -5,7 +5,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import lookup,login_required
+from helpers import lookup,login_required,is_valid
 
 # configure application
 app = Flask(__name__)
@@ -19,9 +19,6 @@ if app.config["DEBUG"]:
         response.headers["Pragma"] = "no-cache"
         return response
 
-# custom filter
-#app.jinja_env.filters["rs"] = rs
-
 # configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
@@ -34,34 +31,9 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    symbol=list()
-    share=list()
-    price=list()
-    total=list()
-    # total=[]
-    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
-    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
-    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
-    for i in range (len(sy)):
-        symbol.append(sy[i]["symbol"].upper())
-    for i in range (len(sh)):
-        share.append(sh[i]["shares"])  
-    for i in range (len(pr)):
-        price.append(pr[i]["price"])
-    # templates=dict(symbols=symbol,shares=share,prices=price)
-    for i in range(len(symbol)):
-        total.append(price[i]*share[i])
-    data = zip(symbol,share,price,total)
-    sum = 0.0
-    for i in range(len(total)):
-        sum+=total[i]
-    for i in range(len(total)):
-        total[i]=str(total[i])
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    # cash = float("{:.2f}".format(rows[0]["cash"]))
-    sum+=cash[0]["cash"]
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    return render_template("index.html", data=data, sum=sum, cash=cash[0]["cash"], user=user[0]["username"])
+    return render_template("index.html", cash=cash[0]["cash"], user=user[0]["username"])
     
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -166,22 +138,14 @@ def quote():
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     if request.method == "POST":
-        result = lookup(request.form.get("symbol"))
+        result = is_valid(request.form.get("symbol"))
         if result is None:
             flash("invalid stock!!", "error")
             return render_template("quote.html")
         else:
-            return render_template("quoted.html", name=result["name"], symbol=result["symbol"], price=result["price"], user=user[0]["username"], cash=cash[0]["cash"])
+            return render_template("quoted.html", symbol=result["symbol"], user=user[0]["username"], cash=cash[0]["cash"])
     else:
       return render_template("quote.html", user=user[0]["username"], cash=cash[0]["cash"])  
-
-@app.route("/update_quote", methods = ["GET", "POST"])
-@login_required
-def update_quote():
-    symbol = request.args.get('symbol')
-    temp=lookup(symbol)
-    price=temp["price"]
-    return jsonify(price)   
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

@@ -34,3 +34,11 @@ def lookup(symbol):
         }
     else:
         return None
+def is_valid(symbol):
+    valid = nse.is_valid_code(symbol)
+    if valid == True:
+        return {
+            "symbol": symbol.upper()
+        }
+    else:
+        return None
