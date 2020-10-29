@@ -43,18 +43,22 @@ def buy():
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     if request.method == "POST":
+        symbol = request.form.get("symbol")
         stock = lookup(request.form.get("symbol"))
         if stock is None:
             flash("Invalid Stock", "error")
             return redirect(url_for("buy"))
         amount = request.form.get("shares")
-        if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0:
-            flash("Invalid Shares!", "error")
-            return redirect(url_for("buy"))
+        if amount is None:
+            return render_template("buy.html", symbol = symbol, user=user[0]["username"], cash=cash[0]["cash"], name = stock["name"], price = stock["price"])
+        else:
+            if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0:
+                flash("Invalid Shares!", "error")
+                return redirect(url_for("buy"))
         
         if cash[0]["cash"] > float(amount)*stock["price"]:
             try:
-                db.execute("INSERT INTO portfolio (id, symbol, shares, price) VALUES(:id, :symbol, :shares, :price)", id= session['user_id'], symbol=request.form.get("symbol"), shares=request.form.get("shares"), price=stock["price"])
+                db.execute("INSERT INTO portfolio (id, symbol, shares, price) VALUES(:id, :symbol, :shares, :price)", id= session['user_id'], symbol=symbol, shares=amount, price=stock["price"])
             except:
                 temp = db.execute("SELECT shares FROM portfolio WHERE id=:id AND symbol=:symbol", id= session['user_id'], symbol=request.form.get("symbol"))
                 db.execute("UPDATE 'portfolio' SET shares=:shares WHERE id=:id AND symbol=:symbol", shares=temp[0]["shares"]+int(request.form.get("shares")), id=session['user_id'], symbol=request.form.get("symbol"))
@@ -69,6 +73,14 @@ def buy():
         
     else:
         return render_template("buy.html",user=user[0]["username"], cash=cash[0]["cash"])
+
+@app.route("/update_quote", methods = ["GET", "POST"])
+@login_required
+def update_quote():
+    symbol = request.args.get('symbol')
+    temp=lookup(symbol)
+    price=temp["price"]
+    return jsonify(price)
 
 @app.route("/history")
 @login_required
@@ -329,3 +341,6 @@ def update_portfolio():
         return jsonify(latest, gl, lat_value, overall_gl)
     else:
         return "-1"
+
+
+

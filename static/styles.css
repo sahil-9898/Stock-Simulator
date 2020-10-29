@@ -185,6 +185,13 @@ h6{
     border-radius: 100% !important;
     background-color: #036!important;
 }
+.buy-container {
+    padding-top: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 50px; 
+}
 
 
   

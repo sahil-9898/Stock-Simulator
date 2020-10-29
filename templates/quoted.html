@@ -8,7 +8,6 @@
 
 <span id="symbol" style="display:none">{{symbol}}</span>
 <script type="text/javascript">
-    $("#abc").text("a");
     var x = $("#symbol").text();
     var symbol = "BSE:"+x;
     var y1 = {"symbol": symbol,"width": 400,"colorTheme": "light","isTransparent": true,"locale": "in"};
@@ -34,6 +33,16 @@
             </div>
             <!-- TradingView Widget END -->
 
+            <form action="{{ url_for('buy') }}" method="post">
+                <fieldset>
+                    <div class="form-group">
+                        <input autocomplete="off" autofocus class="form-control" name="symbol" type="hidden" value = "{{symbol}}"/>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn" type="submit" style="color: white;background: #2dc7b6;width: 100px;margin-left: 5%;">Buy</button>
+                    </div>
+                </fieldset>
+            </form>
 
             <!-- TradingView Widget BEGIN -->
             <div id="widget2-container">
@@ -43,8 +52,7 @@
             </script>
             <script>
                 var w2 = document.getElementById("w2");
-                w2.textContent = json2;
-                console.log(json2);   
+                w2.textContent = json2;  
             </script>
             </div>
             <!-- TradingView Widget END -->
@@ -75,8 +83,4 @@
         </div>
     </div>
 </div>
-<script>
-    var t = $("a.tv-symbol-profile__link.js-symbol-profile-widget-link");
-    console.log("hiL");
-</script>
 {% endblock %}
