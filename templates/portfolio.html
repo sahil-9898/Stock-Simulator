@@ -50,7 +50,7 @@
         {% for row in data %}
         <tr>
             <td><h6><span style="font-size:25px;color: #4e5ec3">{{row[0]}}</span><br>({{row[1]}})<br>₹{{row[2]}}</h6></td>
-            <td><h6><br>₹{{row[1]*row[2]}}</h6></td>
+            <td><h6><br>₹{{"%.2f"|format(row[1]*row[2])}}</h6></td>
             <td><h6>₹<span class = "latest">{{row[3]}}</span><br>₹<span class="gl">{{ "%.2f"|format((row[3]-row[2])*row[1])}}</span><span class="up"></span><span class="down"></span></h6></td>
         </tr>
         {% endfor %}

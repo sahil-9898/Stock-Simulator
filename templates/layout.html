@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 {% if session.user_id %}
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{cash}}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('wallet') }}"><i class="fas fa-wallet"></i> ₹{{"%.2f"|format(cash)}}</a></li>
                     <li class="nav-item">
                         <div class="dropdown">
                             <button data-toggle="dropdown" class="userButton"><i class="fas fa-user-circle"></i> {{user}}</button>
