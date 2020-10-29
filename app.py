@@ -45,16 +45,13 @@ def buy():
     if request.method == "POST":
         symbol = request.form.get("symbol")
         stock = lookup(request.form.get("symbol"))
-        if stock is None:
-            flash("Invalid Stock", "error")
-            return redirect(url_for("buy"))
         amount = request.form.get("shares")
         if amount is None:
             return render_template("buy.html", symbol = symbol, user=user[0]["username"], cash=cash[0]["cash"], name = stock["name"], price = stock["price"])
         else:
             if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0:
                 flash("Invalid Shares!", "error")
-                return redirect(url_for("buy"))
+                return redirect(url_for("quote"))
         
         if cash[0]["cash"] > float(amount)*stock["price"]:
             try:
@@ -67,12 +64,37 @@ def buy():
             db.execute("UPDATE 'users' SET cash=:cash WHERE id=:id", cash=(cash[0]["cash"])-(float(amount)*stock["price"]), id= session['user_id'])
         else:
             flash("Not Enough Balance", "error")
-            return redirect(url_for("buy"))
+            return redirect(url_for("portfolio"))
         flash("Shares Bought", "success")
         return redirect(url_for("portfolio"))
         
     else:
         return render_template("buy.html",user=user[0]["username"], cash=cash[0]["cash"])
+
+@app.route("/trade")
+@login_required
+def trade():
+    symbol=list()
+    share=list()
+    price=list()
+    total=list()
+    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
+    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
+    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
+    for i in range (len(sy)):
+        symbol.append(sy[i]["symbol"].upper())
+    for i in range (len(sh)):
+        share.append(sh[i]["shares"])  
+    for i in range (len(pr)):
+        price.append(pr[i]["price"])
+    # templates=dict(symbols=symbol,shares=share,prices=price)
+    for i in range(len(symbol)):
+        total.append(price[i]*share[i])
+    data = zip(symbol,share,price,total)
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    return render_template("trade.html", data=data, cash=cash[0]["cash"], user=user[0]["username"])
+
 
 @app.route("/update_quote", methods = ["GET", "POST"])
 @login_required
@@ -198,23 +220,25 @@ def sell():
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     """Sell shares of stock."""
     if request.method == "POST":
-        stock = lookup(request.form.get("symbol"))
-        if stock is None:
-            flash("Invalid Stock", "error")
-            return redirect(url_for("sell"))
+        symbol = request.form.get("symbol")
         amount = request.form.get("shares")
+        
+        stock = lookup(request.form.get("symbol"))
+        if amount is None:
+            return render_template("sell.html", user=user[0]["username"], cash=cash[0]["cash"], symbol = symbol, name= stock["name"], price = stock["price"])
         sy = db.execute("SELECT shares FROM portfolio WHERE id = :id AND symbol=:symbol", id= session['user_id'], symbol=request.form.get("symbol"))
         if not sy:
             flash("You dont own this Stock", "error")
-            return redirect(url_for("sell"))
+            return redirect(url_for("trade"))
         if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0 or int(amount)>sy[0]["shares"]:
             flash("Invalid Shares", "error")
-            return redirect(url_for("sell"))
+            return redirect(url_for("trade"))
         if (sy[0]["shares"]==int(amount)):
             db.execute("DELETE from 'portfolio' WHERE id = :id AND symbol=:symbol",id= session['user_id'], symbol=request.form.get("symbol") )
         else:
             db.execute("UPDATE 'portfolio' SET shares=:shares WHERE id=:id AND symbol=:symbol", shares=sy[0]["shares"]-int(request.form.get("shares")), id=session['user_id'], symbol=request.form.get("symbol"))
-        db.execute("INSERT INTO history (id, symbol, shares, price) VALUES(:id, :symbol, :shares, :price)", id= session['user_id'], symbol=request.form.get("symbol"), shares=-int(request.form.get("shares")), price=stock["price"])
+        transacted = datetime.datetime.now()
+        db.execute("INSERT INTO history (id, symbol, shares, price, transacted) VALUES(:id, :symbol, :shares, :price, :transacted)", id= session['user_id'], symbol=request.form.get("symbol"), shares=-int(request.form.get("shares")), price=stock["price"], transacted = transacted)
         profit = stock["price"]*int(amount)
         temp = db.execute("SELECT cash FROM users WHERE id=:id",id= session['user_id'])
         db.execute("UPDATE 'users' SET cash=:cash WHERE id=:id", cash=temp[0]["cash"]+profit, id= session['user_id'])
