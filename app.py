@@ -5,7 +5,6 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
-
 from helpers import lookup,login_required,is_valid
 
 # configure application
@@ -29,17 +28,154 @@ Session(app)
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    # forget any user_id
+    session.clear()
+
+    # if user reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        username=request.form.get("username")
+        password=request.form.get("password")
+        password2=request.form.get("password2")
+    
+        if password!=password2:
+            flash("Passwords do not match", "error")
+            return render_template("register.html")
+        
+        hash = generate_password_hash(password)
+        try:
+            db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
+        except:
+            flash("Username Already Exists", "error")
+            return render_template("register.html")
+        flash("New user registered", "success")
+        return render_template("login.html")
+
+    else:    
+        return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    # forget any user_id
+    session.clear()
+
+    if request.method == "POST":
+        # query database for username
+        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+
+        # ensure username exists and password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+            flash("Invalid Username/Password", "error")
+            return redirect(url_for("login"))
+
+        # remember which user has logged in
+        session["user_id"] = rows[0]["id"]
+
+        # redirect user to home page
+        flash("success", "welcome")
+        return redirect(url_for("index"))
+
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("login.html")
+
+@app.route("/wallet", methods = ['GET', 'POST'])
+@login_required
+def wallet():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    if request.method=='POST':
+        amount=request.form.get("amount")
+        if not amount.isdigit() or int(amount)<=0:
+            flash("Invalid Amount", "error")
+            return redirect(url_for("wallet"))
+        else:
+            db.execute("UPDATE users SET cash=cash+ :amount WHERE id=:x",amount=amount,x=session["user_id"])
+            cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+            flash("amount added", "success")
+            return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
+    else:
+        return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
+
+@app.route("/changepass", methods=["GET", "POST"])
+@login_required
+def changepass():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+
+    if request.method == "POST":
+        
+        oldpasscheck = db.execute("SELECT hash FROM users WHERE id = :id", id= session['user_id'])
+        
+        if not check_password_hash(oldpasscheck[0]["hash"] ,request.form.get("oldpass")):
+            flash("This is not your current password!", "error")
+            return redirect(url_for("changepass"))
+            
+        if request.form.get("newpass")!=request.form.get("newpass2"):
+            flash("New password do not match", "error")
+            return redirect(url_for("changepass"))
+        
+        hashed = generate_password_hash(request.form.get("newpass"))
+        
+        db.execute("UPDATE 'users' SET hash=:hash WHERE id=:id", hash=hashed, id= session['user_id'])
+        flash("Password Successfully Changed", "success")
+        
+        return redirect(url_for("index"))
+
+    else:    
+        return render_template("changepass.html", user=user[0]["username"], cash=cash[0]["cash"])
+
 @app.route("/")
 @login_required
 def index():
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     return render_template("index.html", cash=cash[0]["cash"], user=user[0]["username"])
-    
+
+@app.route("/quote", methods=["GET", "POST"])
+@login_required
+def quote():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    if request.method == "POST":
+        result = is_valid(request.form.get("symbol"))
+        if result is None:
+            flash("invalid stock!!", "error")
+            return render_template("quote.html")
+        else:
+            return render_template("quoted.html", symbol=result["symbol"], user=user[0]["username"], cash=cash[0]["cash"])
+    else:
+      return render_template("quote.html", user=user[0]["username"], cash=cash[0]["cash"])  
+
+@app.route("/trade")
+@login_required
+def trade():
+    symbol=list()
+    share=list()
+    price=list()
+    total=list()
+    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
+    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
+    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
+    for i in range (len(sy)):
+        symbol.append(sy[i]["symbol"].upper())
+    for i in range (len(sh)):
+        share.append(sh[i]["shares"])  
+    for i in range (len(pr)):
+        price.append(pr[i]["price"])
+    for i in range(len(symbol)):
+        total.append(price[i]*share[i])
+    data = zip(symbol,share,price,total)
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    return render_template("trade.html", data=data, cash=cash[0]["cash"], user=user[0]["username"])
+
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    """Buy shares of stock."""
     user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
     cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
     if request.method == "POST":
@@ -71,30 +207,40 @@ def buy():
     else:
         return render_template("buy.html",user=user[0]["username"], cash=cash[0]["cash"])
 
-@app.route("/trade")
-@login_required
-def trade():
-    symbol=list()
-    share=list()
-    price=list()
-    total=list()
-    sy = db.execute("SELECT symbol FROM portfolio WHERE id = :id", id= session['user_id'])
-    sh = db.execute("SELECT shares FROM portfolio WHERE id = :id", id= session['user_id'])
-    pr = db.execute("SELECT price FROM portfolio WHERE id = :id", id= session['user_id'])
-    for i in range (len(sy)):
-        symbol.append(sy[i]["symbol"].upper())
-    for i in range (len(sh)):
-        share.append(sh[i]["shares"])  
-    for i in range (len(pr)):
-        price.append(pr[i]["price"])
-    # templates=dict(symbols=symbol,shares=share,prices=price)
-    for i in range(len(symbol)):
-        total.append(price[i]*share[i])
-    data = zip(symbol,share,price,total)
-    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    return render_template("trade.html", data=data, cash=cash[0]["cash"], user=user[0]["username"])
 
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def sell():
+    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
+    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        amount = request.form.get("shares")
+        
+        stock = lookup(request.form.get("symbol"))
+        if amount is None:
+            return render_template("sell.html", user=user[0]["username"], cash=cash[0]["cash"], symbol = symbol, name= stock["name"], price = stock["price"])
+        sy = db.execute("SELECT shares FROM portfolio WHERE id = :id AND symbol=:symbol", id= session['user_id'], symbol=request.form.get("symbol"))
+        if not sy:
+            flash("You dont own this Stock", "error")
+            return redirect(url_for("trade"))
+        if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0 or int(amount)>sy[0]["shares"]:
+            flash("Invalid Shares", "error")
+            return redirect(url_for("trade"))
+        if (sy[0]["shares"]==int(amount)):
+            db.execute("DELETE from 'portfolio' WHERE id = :id AND symbol=:symbol",id= session['user_id'], symbol=request.form.get("symbol") )
+        else:
+            db.execute("UPDATE 'portfolio' SET shares=:shares WHERE id=:id AND symbol=:symbol", shares=sy[0]["shares"]-int(request.form.get("shares")), id=session['user_id'], symbol=request.form.get("symbol"))
+        transacted = datetime.datetime.now()
+        db.execute("INSERT INTO history (id, symbol, shares, price, transacted) VALUES(:id, :symbol, :shares, :price, :transacted)", id= session['user_id'], symbol=request.form.get("symbol"), shares=-int(request.form.get("shares")), price=stock["price"], transacted = transacted)
+        profit = stock["price"]*int(amount)
+        temp = db.execute("SELECT cash FROM users WHERE id=:id",id= session['user_id'])
+        db.execute("UPDATE 'users' SET cash=:cash WHERE id=:id", cash=temp[0]["cash"]+profit, id= session['user_id'])
+        flash("Shares Sold", "success")
+        return redirect(url_for("portfolio"))
+        
+    else:
+        return render_template("sell.html", user=user[0]["username"], cash=cash[0]["cash"])
 
 @app.route("/update_quote", methods = ["GET", "POST"])
 @login_required
@@ -129,155 +275,6 @@ def history():
     data = zip(symbol,share,price,transacted)
     return render_template("history.html", data=data, user=user[0]["username"], cash=cash[0]["cash"])
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    """Log user in."""
-
-    # forget any user_id
-    session.clear()
-
-    # if user reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-
-        # query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
-
-        # ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            flash("Invalid Username/Password", "error")
-            return redirect(url_for("login"))
-
-        # remember which user has logged in
-        session["user_id"] = rows[0]["id"]
-
-        # redirect user to home page
-        flash("success", "welcome")
-        return redirect(url_for("index"))
-
-    # else if user reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("login.html")
-
-@app.route("/logout")
-def logout():
-    """Log user out."""
-    # forget any user_id
-    session.clear()
-    
-
-    # redirect user to login form
-    return redirect(url_for("login"))
-
-
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
-def quote():
-    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    if request.method == "POST":
-        result = is_valid(request.form.get("symbol"))
-        if result is None:
-            flash("invalid stock!!", "error")
-            return render_template("quote.html")
-        else:
-            return render_template("quoted.html", symbol=result["symbol"], user=user[0]["username"], cash=cash[0]["cash"])
-    else:
-      return render_template("quote.html", user=user[0]["username"], cash=cash[0]["cash"])  
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    """Register user."""
-
-    # forget any user_id
-    session.clear()
-
-    # if user reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-        username=request.form.get("username")
-        password=request.form.get("password")
-        password2=request.form.get("password2")
-    
-        if password!=password2:
-            flash("Passwords do not match", "error")
-            return render_template("register.html")
-        
-        hash = generate_password_hash(password)
-        try:
-            db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", username=username, hash=hash)
-        except:
-            flash("Username Already Exists", "error")
-            return render_template("register.html")
-        flash("New user registered", "success")
-        return render_template("login.html")
-
-    else:    
-        return render_template("register.html")
-
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
-def sell():
-    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    """Sell shares of stock."""
-    if request.method == "POST":
-        symbol = request.form.get("symbol")
-        amount = request.form.get("shares")
-        
-        stock = lookup(request.form.get("symbol"))
-        if amount is None:
-            return render_template("sell.html", user=user[0]["username"], cash=cash[0]["cash"], symbol = symbol, name= stock["name"], price = stock["price"])
-        sy = db.execute("SELECT shares FROM portfolio WHERE id = :id AND symbol=:symbol", id= session['user_id'], symbol=request.form.get("symbol"))
-        if not sy:
-            flash("You dont own this Stock", "error")
-            return redirect(url_for("trade"))
-        if not amount.isdigit() or (int(amount))%1!=0 or (int(amount))<=0 or int(amount)>sy[0]["shares"]:
-            flash("Invalid Shares", "error")
-            return redirect(url_for("trade"))
-        if (sy[0]["shares"]==int(amount)):
-            db.execute("DELETE from 'portfolio' WHERE id = :id AND symbol=:symbol",id= session['user_id'], symbol=request.form.get("symbol") )
-        else:
-            db.execute("UPDATE 'portfolio' SET shares=:shares WHERE id=:id AND symbol=:symbol", shares=sy[0]["shares"]-int(request.form.get("shares")), id=session['user_id'], symbol=request.form.get("symbol"))
-        transacted = datetime.datetime.now()
-        db.execute("INSERT INTO history (id, symbol, shares, price, transacted) VALUES(:id, :symbol, :shares, :price, :transacted)", id= session['user_id'], symbol=request.form.get("symbol"), shares=-int(request.form.get("shares")), price=stock["price"], transacted = transacted)
-        profit = stock["price"]*int(amount)
-        temp = db.execute("SELECT cash FROM users WHERE id=:id",id= session['user_id'])
-        db.execute("UPDATE 'users' SET cash=:cash WHERE id=:id", cash=temp[0]["cash"]+profit, id= session['user_id'])
-        flash("Shares Sold", "success")
-        return redirect(url_for("portfolio"))
-        
-    else:
-        return render_template("sell.html", user=user[0]["username"], cash=cash[0]["cash"])
-
-
-@app.route("/changepass", methods=["GET", "POST"])
-@login_required
-def changepass():
-    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    """Change password."""
-    # if user reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-        
-        oldpasscheck = db.execute("SELECT hash FROM users WHERE id = :id", id= session['user_id'])
-        
-        if not check_password_hash(oldpasscheck[0]["hash"] ,request.form.get("oldpass")):
-            flash("This is not your current password!", "error")
-            return redirect(url_for("changepass"))
-            
-        if request.form.get("newpass")!=request.form.get("newpass2"):
-            flash("New password do not match", "error")
-            return redirect(url_for("changepass"))
-        
-        hashed = generate_password_hash(request.form.get("newpass"))
-        
-        db.execute("UPDATE 'users' SET hash=:hash WHERE id=:id", hash=hashed, id= session['user_id'])
-        flash("Password Successfully Changed", "success")
-        
-        return redirect(url_for("index"))
-
-    else:    
-        return render_template("changepass.html", user=user[0]["username"], cash=cash[0]["cash"])
-
 @app.route("/portfolio")
 @login_required
 def portfolio():
@@ -299,7 +296,6 @@ def portfolio():
             share.append(sh[i]["shares"])  
         for i in range (len(pr)):
             price.append(pr[i]["price"])
-        # templates=dict(symbols=symbol,shares=share,prices=price)
         data = zip(symbol,share,price,latest)
         inv_amt=list()
         gl=list()
@@ -316,23 +312,6 @@ def portfolio():
     else:
         return render_template("portfolio.html",lat_value=0,top_gain='-',top_loss='-',overall_gl=0,cash=cash[0]["cash"], user=user[0]["username"])
 
-@app.route("/wallet", methods = ['GET', 'POST'])
-@login_required
-def wallet():
-    user = db.execute("SELECT username FROM users WHERE id = :id", id= session['user_id'])
-    cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-    if request.method=='POST':
-        amount=request.form.get("amount")
-        if not amount.isdigit() or int(amount)<=0:
-            flash("Invalid Amount", "error")
-            return redirect(url_for("wallet"))
-        else:
-            db.execute("UPDATE users SET cash=cash+ :amount WHERE id=:x",amount=amount,x=session["user_id"])
-            cash = db.execute("SELECT cash FROM users WHERE id=:id", id= session['user_id'])
-            flash("amount added", "success")
-            return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
-    else:
-        return render_template("wallet.html",cash=cash[0]["cash"], user=user[0]["username"])
 
 
 @app.route("/update_portfolio", methods = ['GET', 'POST'])
@@ -359,12 +338,29 @@ def update_portfolio():
             gl.append(float("%.2f" % glst))
             inv_amt.append(price[i]*share[i])
         tot_inv=float("%.2f" % sum(inv_amt))
-        overall_gl=sum(gl)
+        overall_gl=float("%.2f"%sum(gl))
         lat_value=tot_inv + overall_gl
+        lat_value_final = float("%.2f" % lat_value)
         
-        return jsonify(latest, gl, lat_value, overall_gl)
+        return jsonify(latest, gl, lat_value_final, overall_gl)
     else:
         return "-1"
+
+@app.route("/logout")
+def logout():
+    # forget any user_id
+    session.clear()
+    return redirect(url_for("login"))
+
+
+
+
+
+
+
+
+
+
 
 
 
