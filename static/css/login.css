@@ -30,7 +30,9 @@
 
 /*//////////////////////////////////////////////////////////////////
 [ RESTYLE TAG ]*/
-
+.p-t-115 {padding-top: 115px;}
+.p-b-48 {padding-bottom: 48px;}
+.p-b-26 {padding-bottom: 26px;}
 * {
 	margin: 0px; 
 	padding: 0px; 
