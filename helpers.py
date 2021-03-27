@@ -1,10 +1,11 @@
+from functools import wraps
+from flask import redirect, render_template, request, session, url_for
 import csv
 import urllib.request
 from nsetools import Nse
-nse=Nse()
-
-from flask import redirect, render_template, request, session, url_for
-from functools import wraps
+import json
+import requests
+nse = Nse()
 
 
 def login_required(f):
@@ -20,12 +21,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 def lookup(symbol):
     valid = nse.is_valid_code(symbol)
     if valid == True:
-        stockdetails=nse.get_quote(symbol)
+        stockdetails = nse.get_quote(symbol)
         price = stockdetails['buyPrice1']
-        if price==None:
+        if price == None:
             price = stockdetails['lastPrice']
         return {
             "name": stockdetails['companyName'],
@@ -34,6 +36,8 @@ def lookup(symbol):
         }
     else:
         return None
+
+
 def is_valid(symbol):
     valid = nse.is_valid_code(symbol)
     if valid == True:
@@ -42,3 +46,16 @@ def is_valid(symbol):
         }
     else:
         return None
+
+
+def lookup2(symbol):
+    url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + \
+        symbol+".BO&apikey=ZT190HZDN99BS851"
+    res = requests.get(url)
+    res2 = json.loads(res.text)
+    result = res2['Global Quote']
+    if len(result) == 0:
+        return None
+    else:
+        x = float(result['05. price'])
+        return x
